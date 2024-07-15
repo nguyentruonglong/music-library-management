@@ -1,0 +1,27 @@
+# Node modules and vendor directories
+frontend/node_modules
+backend/vendor
+
+# Environment files
+frontend/.env.local
+backend/.env.local
+
+# Logs
+*.log
+
+# Temporary files
+tmp
+temp
+
+# Git files
+.git
+.gitignore
+
+# Docker files
+docker-compose.override.yml
+
+# Frontend build directory
+frontend/build
+
+# Miscellaneous
+.DS_Store

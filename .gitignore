@@ -1,0 +1,46 @@
+# Node dependencies
+/frontend/node_modules
+
+# Production build
+/frontend/build
+
+# Frontend environment variables
+/frontend/.env.local
+
+# Backend environment variables
+/backend/.env.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.vscode
+.idea
+
+# Miscellaneous
+.DS_Store
+.env
+.env.local
+.env.*.local
+
+# Dependency directories
+/backend/vendor
+/backend/node_modules
+
+# Go binaries
+/backend/*.exe
+/backend/*.test
+/backend/*.out
+
+# Docker files
+docker-compose.override.yml
+
+# Backend specific ignores
+/backend/coverage
+
+# Frontend specific ignores
+/frontend/coverage
