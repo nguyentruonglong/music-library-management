@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
@@ -11,6 +12,11 @@ import (
 )
 
 func main() {
+	// Set Gin mode based on environment
+	if os.Getenv("ENV") == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -34,6 +40,9 @@ func main() {
 
 	// Initialize Gin router
 	router := gin.Default()
+
+	// Set trusted proxies
+	router.SetTrustedProxies(nil)
 
 	// Middleware
 	router.Use(middleware.CORSMiddleware())
