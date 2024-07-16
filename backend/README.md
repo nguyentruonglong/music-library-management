@@ -19,7 +19,15 @@
        - `mp3_file` (file, required)
    - **Sample cURL Request:**
      ```bash
-     curl -X POST http://localhost:8080/api/tracks -F "title=Bài hát mới" -F "cover_image=@/cover.jpg" -F "artist=Ca sĩ A" -F "album=Album B" -F "genre=Pop" -F "release_year=2021" -F "duration=240" -F "mp3_file=@/file.mp3"
+        curl --location 'http://localhost:8080/api/tracks/' \
+      --form 'title="Bài hát mới"' \
+      --form 'cover_image=@"/Users/nguyentruonglong/Desktop/retro-wave-music.jpg"' \
+      --form 'artist="Ca sĩ A"' \
+      --form 'album="Album B"' \
+      --form 'genre="Pop"' \
+      --form 'release_year="2021"' \
+      --form 'duration="240"' \
+      --form 'mp3_file=@"/Users/nguyentruonglong/Desktop/219592.mp3"'
      ```
 
 2. **View Details of a Specific Music Track**
@@ -28,7 +36,7 @@
    - **Request Parameters:** `id` - The ID of the music track.
    - **Sample cURL Request:**
      ```bash
-     curl -X GET http://localhost:8080/api/tracks/60c72b2f9b1d8b6e9f3e9f3e
+      curl --location 'http://localhost:8080/api/tracks/66969d474132fbac97fcc672'
      ```
 
 3. **Update an Existing Music Track**
@@ -47,7 +55,15 @@
        - `mp3_file` (file, optional)
    - **Sample cURL Request:**
      ```bash
-     curl -X PUT http://localhost:8080/api/tracks/60c72b2f9b1d8b6e9f3e9f3e -F "title=Bài hát cập nhật" -F "cover_image=@/updated_cover.jpg" -F "artist=Ca sĩ B" -F "album=Album C" -F "genre=Rock" -F "release_year=2022" -F "duration=300" -F "mp3_file=@/updated_file.mp3"
+        curl --location --request PUT 'http://localhost:8080/api/tracks/6696847da3b2ae928a1b9c7e' \
+      --form 'title="Bài hát cập nhật"' \
+      --form 'cover_image=@"/Users/nguyentruonglong/Desktop/retro-wave-music.jpg"' \
+      --form 'artist="Ca sĩ B"' \
+      --form 'album="Album C"' \
+      --form 'genre="Rock"' \
+      --form 'release_year="2022"' \
+      --form 'duration="300"' \
+      --form 'mp3_file=@"/Users/nguyentruonglong/Desktop/219592.mp3"'
      ```
 
 4. **Delete a Music Track**
@@ -56,7 +72,7 @@
    - **Request Parameters:** `id` - The ID of the music track.
    - **Sample cURL Request:**
      ```bash
-     curl -X DELETE http://localhost:8080/api/tracks/60c72b2f9b1d8b6e9f3e9f3e
+      curl --location --request DELETE 'http://localhost:8080/api/tracks/669698214132fbac97fcc671'
      ```
 
 5. **List All Music Tracks**
@@ -67,7 +83,7 @@
      - `limit` - The number of items per page (default is 10).
    - **Sample cURL Request:**
      ```bash
-     curl -X GET http://localhost:8080/api/tracks?page=1&limit=10
+      curl --location 'http://localhost:8080/api/tracks?page=1&limit=10'
      ```
 
 6. **Play/Pause an MP3 File of a Music Track**

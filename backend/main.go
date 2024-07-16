@@ -6,7 +6,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"music-library-management/api/middleware"
+	"music-library-management/api/controllers"
+	// "music-library-management/api/middleware"
+	"music-library-management/api/routes"
+	"music-library-management/api/services"
 	"music-library-management/api/utils"
 	"music-library-management/config"
 )
@@ -45,7 +48,14 @@ func main() {
 	router.SetTrustedProxies(nil)
 
 	// Middleware
-	router.Use(middleware.CORSMiddleware())
+	// router.Use(middleware.CORSMiddleware())
+
+	// Initialize services and controllers
+	trackService := services.NewTrackService(client, cfg)
+	trackController := controllers.NewTrackController(trackService)
+
+	// Initialize routes
+	routes.TrackRoutes(router, trackController)
 
 	// Start the server
 	log.Fatal(router.Run(":" + cfg.Port))

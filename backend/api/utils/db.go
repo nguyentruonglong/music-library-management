@@ -49,7 +49,7 @@ func GetDatabase(client *mongo.Client, cfg *config.Config) *mongo.Database {
 
 // InitializeCollections ensures that the required collections exist
 func InitializeCollections(db *mongo.Database) error {
-	collections := []string{}
+	collections := []string{"tracks", "playlists", "genres"}
 	for _, collection := range collections {
 		exists, err := collectionExists(db, collection)
 		if err != nil {
@@ -77,4 +77,9 @@ func collectionExists(db *mongo.Database, collectionName string) (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+// GetDBCollection returns a MongoDB collection instance
+func GetDBCollection(client *mongo.Client, cfg *config.Config, collectionName string) *mongo.Collection {
+	return client.Database(cfg.MongoDB).Collection(collectionName)
 }
