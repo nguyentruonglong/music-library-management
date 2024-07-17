@@ -47,7 +47,7 @@ func (s *PlaylistService) GetPlaylist(playlistId string) (*models.Playlist, erro
 	}
 
 	var playlist models.Playlist
-	err = s.collection.FindOne(context.Background(), bson.M{"_id": objectID, "is_deleted": false}).Decode(&playlist) // Find playlist by ID
+	err = s.collection.FindOne(context.Background(), bson.M{"_id": objectID, "is_deleted": false}).Decode(&playlist) // Find playlist by ID and check if it's not deleted
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.ErrPlaylistNotFound
@@ -79,7 +79,7 @@ func (s *PlaylistService) UpdatePlaylist(playlistId string, updatedPlaylist *mod
 	updatedPlaylist.CreatedAt = existingPlaylist.CreatedAt
 	updatedPlaylist.BeforeUpdate() // Set updated values before updating the playlist
 
-	filter := bson.M{"_id": objectID, "is_deleted": false}
+	filter := bson.M{"_id": objectID, "is_deleted": false} // Filter to find the playlist by ID and check if it's not deleted
 	update := bson.M{
 		"$set": updatedPlaylist, // Set updated playlist values
 	}
@@ -122,7 +122,7 @@ func (s *PlaylistService) DeletePlaylist(playlistId string) error {
 		},
 	}
 
-	result := s.collection.FindOneAndUpdate(context.Background(), bson.M{"_id": objectID}, update, nil)
+	result := s.collection.FindOneAndUpdate(context.Background(), bson.M{"_id": objectID}, update, nil) // Update the playlist to set it as deleted
 	if result.Err() != nil {
 		return errors.ErrDatabaseOperation
 	}
@@ -132,12 +132,14 @@ func (s *PlaylistService) DeletePlaylist(playlistId string) error {
 
 // ListPlaylists lists all playlists with pagination
 func (s *PlaylistService) ListPlaylists(page, limit int) ([]*models.Playlist, int64, error) {
-	skip := (page - 1) * limit
+	skip := (page - 1) * limit // Calculate the number of documents to skip
 	findOptions := options.Find()
-	findOptions.SetSkip(int64(skip))   // Set the number of documents to skip
-	findOptions.SetLimit(int64(limit)) // Set the number of documents to return
+	findOptions.SetSkip(int64(skip))                            // Set the number of documents to skip
+	findOptions.SetLimit(int64(limit))                          // Set the number of documents to return
+	findOptions.SetSort(bson.D{{Key: "created_at", Value: -1}}) // Sort by created_at in descending order
 
-	cursor, err := s.collection.Find(context.Background(), bson.M{"is_deleted": false}, findOptions) // Find playlists
+	// Execute the find query
+	cursor, err := s.collection.Find(context.Background(), bson.M{"is_deleted": false}, findOptions) // Find playlists that are not deleted
 	if err != nil {
 		return nil, 0, errors.ErrDatabaseOperation
 	}
@@ -148,12 +150,13 @@ func (s *PlaylistService) ListPlaylists(page, limit int) ([]*models.Playlist, in
 		return nil, 0, errors.ErrDatabaseOperation
 	}
 
-	total, err := s.collection.CountDocuments(context.Background(), bson.M{"is_deleted": false}) // Get the total number of playlists
+	// Count total matching documents
+	total, err := s.collection.CountDocuments(context.Background(), bson.M{"is_deleted": false}) // Get the total number of playlists that are not deleted
 	if err != nil {
 		return nil, 0, errors.ErrDatabaseOperation
 	}
 
-	return playlists, total, nil
+	return playlists, total, nil // Return found playlists and total count
 }
 
 // AddTrackToPlaylist adds a track to a playlist
@@ -182,7 +185,7 @@ func (s *PlaylistService) AddTrackToPlaylist(playlistId, trackId string) error {
 		}
 	}
 
-	filter := bson.M{"_id": playlistObjectID, "is_deleted": false}
+	filter := bson.M{"_id": playlistObjectID, "is_deleted": false} // Filter to find the playlist by ID and check if it's not deleted
 	update := bson.M{
 		"$addToSet": bson.M{"tracks": track.ID}, // Add track ID to the tracks array in the playlist
 	}
@@ -226,7 +229,7 @@ func (s *PlaylistService) RemoveTrackFromPlaylist(playlistId, trackId string) er
 		return errors.ErrTrackNotInPlaylist
 	}
 
-	filter := bson.M{"_id": playlistObjectID, "is_deleted": false}
+	filter := bson.M{"_id": playlistObjectID, "is_deleted": false} // Filter to find the playlist by ID and check if it's not deleted
 	update := bson.M{
 		"$pull": bson.M{"tracks": track.ID}, // Remove track ID from the tracks array in the playlist
 	}

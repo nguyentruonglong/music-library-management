@@ -191,19 +191,31 @@
       curl --location 'http://localhost:8080/api/playlists?page=1&limit=10'
       ```
 
-14. **Search for Music Tracks and Playlists**
-    - **Endpoint:** `/api/search` (GET)
-    - **Description:** Search for music tracks and playlists by title, artist, album, or genre.
+14. **Search for Music Tracks**
+    - **Endpoint:** `/api/search/tracks` (GET)
+    - **Description:** Search for music tracks by title, artist, album, or genre.
     - **Request Query Parameters:** 
       - `query` - The search query string.
       - `page` - The page number for pagination (default is 1).
       - `limit` - The number of items per page (default is 10).
     - **Sample cURL Request:**
       ```bash
-      curl -X GET http://localhost:8080/api/search?query=B%C3%A0i%20h%C3%A1t&page=1&limit=10
+      curl --location 'http://localhost:8080/api/search/tracks?query=B%C3%A0i%20h%C3%A1t&page=1&limit=10'
       ```
 
-15. **List All Genres**
+15. **Search for Playlists**
+    - **Endpoint:** `/api/search/playlists` (GET)
+    - **Description:** Search for playlists by name.
+    - **Request Query Parameters:** 
+      - `query` - The search query string.
+      - `page` - The page number for pagination (default is 1).
+      - `limit` - The number of items per page (default is 10).
+    - **Sample cURL Request:**
+      ```bash
+      curl -X GET 'http://localhost:8080/api/search/playlists?query=T%C3%AAn%20Playlist&page=1&limit=10'
+      ```
+
+16. **List All Genres**
     - **Endpoint:** `/api/genres` (GET)
     - **Description:** Provides a list of available genres.
     - **Sample cURL Request:**

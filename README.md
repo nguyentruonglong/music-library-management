@@ -61,6 +61,7 @@ music-library-management/
 │   │   │   ├── track_controller.go         # Controller for track endpoints
 │   │   │   ├── playlist_controller.go      # Controller for playlist endpoints
 │   │   │   ├── genre_controller.go         # Controller for genre endpoints
+│   │   │   ├── search_controller.go        # Controller for search endpoints
 │   │   │   └── ...              
 │   │   ├── models/                         # Database models
 │   │   │   ├── track.go                    # Model for track
@@ -71,11 +72,13 @@ music-library-management/
 │   │   │   ├── track_routes.go             # Routes for track endpoints
 │   │   │   ├── playlist_routes.go          # Routes for playlist endpoints
 │   │   │   ├── genre_routes.go             # Routes for genre endpoints
+│   │   │   ├── search_routes.go            # Routes for search endpoints
 │   │   │   └── ...              
 │   │   ├── services/                       # Business logic and services
 │   │   │   ├── track_service.go            # Service for track logic
 │   │   │   ├── playlist_service.go         # Service for playlist logic
 │   │   │   ├── genre_service.go            # Service for genre logic
+│   │   │   ├── search_service.go           # Service for search logic
 │   │   │   └── ...              
 │   │   ├── utils/                          # Utility functions and helpers
 │   │   │   ├── db.go                       # Database connection and setup

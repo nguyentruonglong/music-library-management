@@ -62,10 +62,14 @@ func main() {
 	genreService := services.NewGenreService(client, cfg)
 	genreController := controllers.NewGenreController(genreService)
 
+	searchService := services.NewSearchService(client, cfg)
+	searchController := controllers.NewSearchController(searchService)
+
 	// Initialize routes
 	routes.TrackRoutes(router, trackController)
 	routes.PlaylistRoutes(router, playlistController)
 	routes.GenreRoutes(router, genreController)
+	routes.SearchRoutes(router, searchController)
 
 	// Start the server
 	log.Fatal(router.Run(":" + cfg.Port))
