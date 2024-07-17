@@ -83,7 +83,7 @@ func InitializeCollections(db *mongo.Database) error {
 // collectionExists checks if a collection exists in the database
 func collectionExists(db *mongo.Database, collectionName string) (bool, error) {
 	// List all collection names in the database that match the given collection name
-	collections, err := db.ListCollectionNames(context.Background(), bson.D{{"name", collectionName}})
+	collections, err := db.ListCollectionNames(context.Background(), bson.D{{Key: "name", Value: collectionName}})
 	if err != nil {
 		return false, err // Return an error if listing collection names fails
 	}
