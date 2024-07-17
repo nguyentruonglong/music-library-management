@@ -86,7 +86,7 @@ func (tc *TrackController) AddTrack(c *gin.Context) {
 }
 
 func (tc *TrackController) GetTrack(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("trackId")
 
 	track, err := tc.trackService.GetTrack(id)
 	if err != nil {
@@ -99,7 +99,7 @@ func (tc *TrackController) GetTrack(c *gin.Context) {
 }
 
 func (tc *TrackController) UpdateTrack(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("trackId")
 
 	// Check if the track exists
 	_, err := tc.trackService.GetTrack(id)
@@ -165,7 +165,7 @@ func (tc *TrackController) UpdateTrack(c *gin.Context) {
 }
 
 func (tc *TrackController) DeleteTrack(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("trackId")
 
 	err := tc.trackService.DeleteTrack(id)
 	if err != nil {
@@ -192,7 +192,7 @@ func (tc *TrackController) ListTracks(c *gin.Context) {
 }
 
 func (tc *TrackController) PlayPauseTrack(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("trackId")
 	var requestBody struct {
 		Action string `json:"action"`
 	}

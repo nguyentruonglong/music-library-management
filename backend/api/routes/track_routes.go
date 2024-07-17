@@ -15,18 +15,18 @@ func TrackRoutes(router *gin.Engine, trackController *controllers.TrackControlle
 		trackRoutes.POST("/", trackController.AddTrack)
 
 		// View details of a specific music track
-		trackRoutes.GET("/:id", trackController.GetTrack)
+		trackRoutes.GET("/:trackId", trackController.GetTrack)
 
 		// Update an existing music track, including the cover image
-		trackRoutes.PUT("/:id", trackController.UpdateTrack)
+		trackRoutes.PUT("/:trackId", trackController.UpdateTrack)
 
 		// Delete a music track
-		trackRoutes.DELETE("/:id", trackController.DeleteTrack)
+		trackRoutes.DELETE("/:trackId", trackController.DeleteTrack)
 
 		// List all music tracks with pagination
 		trackRoutes.GET("/", trackController.ListTracks)
 
 		// Play/Pause an MP3 file of a music track
-		trackRoutes.POST("/:id/play", trackController.PlayPauseTrack)
+		trackRoutes.POST("/:trackId/play", trackController.PlayPauseTrack)
 	}
 }

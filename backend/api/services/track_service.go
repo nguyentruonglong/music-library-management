@@ -2,10 +2,10 @@ package services
 
 import (
 	"context"
-	"errors"
 	"music-library-management/api/models"
 	"music-library-management/api/utils"
 	"music-library-management/config"
+	"music-library-management/errors"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -17,46 +17,52 @@ type TrackService struct {
 	collection *mongo.Collection
 }
 
+// NewTrackService creates a new TrackService
 func NewTrackService(client *mongo.Client, cfg *config.Config) *TrackService {
 	return &TrackService{
 		collection: utils.GetDBCollection(client, cfg, "tracks"),
 	}
 }
 
+// AddTrack adds a new track to the database
 func (s *TrackService) AddTrack(track *models.Track) (*models.Track, error) {
-	track.BeforeCreate()
+	track.BeforeCreate() // Set default values before creating a new track
 
-	_, err := s.collection.InsertOne(context.Background(), track)
+	_, err := s.collection.InsertOne(context.Background(), track) // Insert the track into the database
 	if err != nil {
-		return nil, err
+		return nil, errors.ErrDatabaseOperation
 	}
 
 	return track, nil
 }
 
+// GetTrack retrieves a track by its ID
 func (s *TrackService) GetTrack(id string) (*models.Track, error) {
-	objectID, err := primitive.ObjectIDFromHex(id)
+	objectID, err := primitive.ObjectIDFromHex(id) // Convert string ID to ObjectID
 	if err != nil {
-		return nil, err
+		return nil, errors.ErrInvalidObjectID
 	}
 
 	var track models.Track
-	err = s.collection.FindOne(context.Background(), bson.M{"_id": objectID, "is_deleted": false}).Decode(&track)
+	err = s.collection.FindOne(context.Background(), bson.M{"_id": objectID, "is_deleted": false}).Decode(&track) // Find track by ID
 	if err != nil {
-		return nil, err
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.ErrTrackNotFound
+		}
+		return nil, errors.ErrDatabaseOperation
 	}
 
 	return &track, nil
 }
 
+// UpdateTrack updates an existing track
 func (s *TrackService) UpdateTrack(id string, updatedTrack *models.Track) (*models.Track, error) {
-	objectID, err := primitive.ObjectIDFromHex(id)
+	objectID, err := primitive.ObjectIDFromHex(id) // Convert string ID to ObjectID
 	if err != nil {
-		return nil, err
+		return nil, errors.ErrInvalidObjectID
 	}
 
-	// Retrieve the existing track to preserve the old values
-	existingTrack, err := s.GetTrack(id)
+	existingTrack, err := s.GetTrack(id) // Retrieve the existing track
 	if err != nil {
 		return nil, err
 	}
@@ -88,76 +94,100 @@ func (s *TrackService) UpdateTrack(id string, updatedTrack *models.Track) (*mode
 	}
 	updatedTrack.ID = existingTrack.ID
 	updatedTrack.CreatedAt = existingTrack.CreatedAt
-	updatedTrack.BeforeUpdate()
+	updatedTrack.BeforeUpdate() // Set updated values before updating the track
 
-	filter := bson.M{"_id": objectID, "is_deleted": false}
+	filter := bson.M{"_id": objectID, "is_deleted": false} // Filter to find the track by ID
 	update := bson.M{
-		"$set": updatedTrack,
+		"$set": updatedTrack, // Update the track with new values
 	}
 
-	result := s.collection.FindOneAndUpdate(context.Background(), filter, update, nil)
+	result := s.collection.FindOneAndUpdate(context.Background(), filter, update, nil) // Update the track in the database
 	if result.Err() != nil {
-		return nil, result.Err()
+		return nil, errors.ErrDatabaseOperation
 	}
 
 	var track models.Track
-	err = result.Decode(&track)
+	err = result.Decode(&track) // Decode the updated track
 	if err != nil {
-		return nil, err
+		return nil, errors.ErrDatabaseOperation
 	}
 
 	return &track, nil
 }
 
+// DeleteTrack soft deletes a track by setting is_deleted to true
 func (s *TrackService) DeleteTrack(id string) error {
-	objectID, err := primitive.ObjectIDFromHex(id)
+	objectID, err := primitive.ObjectIDFromHex(id) // Convert string ID to ObjectID
 	if err != nil {
-		return err
+		return errors.ErrInvalidObjectID
 	}
 
-	// Soft delete the track
 	var track models.Track
-	err = s.collection.FindOne(context.Background(), bson.M{"_id": objectID, "is_deleted": false}).Decode(&track)
+	err = s.collection.FindOne(context.Background(), bson.M{"_id": objectID, "is_deleted": false}).Decode(&track) // Find track by ID
 	if err != nil {
-		return err
+		if err == mongo.ErrNoDocuments {
+			return errors.ErrTrackNotFound
+		}
+		return errors.ErrDatabaseOperation
 	}
-	track.SoftDelete()
+
+	track.SoftDelete() // Apply soft delete to the track
 
 	update := bson.M{
-		"$set": track,
+		"$set": bson.M{
+			"is_deleted": track.IsDeleted,
+			"deleted_at": track.DeletedAt,
+			"updated_at": track.UpdatedAt,
+		},
 	}
 
-	result := s.collection.FindOneAndUpdate(context.Background(), bson.M{"_id": objectID}, update, nil)
+	result := s.collection.FindOneAndUpdate(context.Background(), bson.M{"_id": objectID}, update, nil) // Update the track to soft delete it
 	if result.Err() != nil {
-		return result.Err()
+		return errors.ErrDatabaseOperation
 	}
 
 	return nil
 }
 
-func (s *TrackService) ListTracks(page, limit int) ([]*models.Track, error) {
-	skip := (page - 1) * limit
+// ListTracks lists all tracks with pagination
+func (s *TrackService) ListTracks(page, limit int) (*models.PaginatedTracks, error) {
+	skip := (page - 1) * limit // Calculate the number of documents to skip
 	findOptions := options.Find()
-	findOptions.SetSkip(int64(skip))
-	findOptions.SetLimit(int64(limit))
+	findOptions.SetSkip(int64(skip))   // Set the number of documents to skip
+	findOptions.SetLimit(int64(limit)) // Set the number of documents to return
 
-	cursor, err := s.collection.Find(context.Background(), bson.M{"is_deleted": false}, findOptions)
+	cursor, err := s.collection.Find(context.Background(), bson.M{"is_deleted": false}, findOptions) // Find tracks
 	if err != nil {
-		return nil, err
+		return nil, errors.ErrDatabaseOperation
 	}
 
 	var tracks []*models.Track
-	err = cursor.All(context.Background(), &tracks)
+	err = cursor.All(context.Background(), &tracks) // Decode all tracks
 	if err != nil {
-		return nil, err
+		return nil, errors.ErrDatabaseOperation
 	}
 
-	return tracks, nil
+	total, err := s.collection.CountDocuments(context.Background(), bson.M{"is_deleted": false}) // Get the total number of tracks
+	if err != nil {
+		return nil, errors.ErrDatabaseOperation
+	}
+
+	// Create a PaginatedTracks response
+	paginatedTracks := &models.PaginatedTracks{
+		Total:      total,
+		Page:       page,
+		Limit:      limit,
+		TotalPages: int((total + int64(limit) - 1) / int64(limit)),
+		Tracks:     tracks,
+	}
+
+	return paginatedTracks, nil
 }
 
+// PlayPauseTrack plays or pauses a track based on the action provided
 func (s *TrackService) PlayPauseTrack(id string, action string) error {
-	if action != "play" && action != "pause" {
-		return errors.New("invalid action")
+	if action != "play" && action != "pause" { // Validate action
+		return errors.ErrBadRequest
 	}
 
 	return nil

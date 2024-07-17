@@ -54,8 +54,12 @@ func main() {
 	trackService := services.NewTrackService(client, cfg)
 	trackController := controllers.NewTrackController(trackService)
 
+	playlistService := services.NewPlaylistService(client, cfg, trackService)
+	playlistController := controllers.NewPlaylistController(playlistService)
+
 	// Initialize routes
 	routes.TrackRoutes(router, trackController)
+	routes.PlaylistRoutes(router, playlistController)
 
 	// Start the server
 	log.Fatal(router.Run(":" + cfg.Port))

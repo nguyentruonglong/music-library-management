@@ -17,10 +17,10 @@ type Track struct {
 	ReleaseYear   int                `bson:"release_year" json:"release_year"`
 	Duration      int                `bson:"duration" json:"duration" binding:"required"` // Duration in seconds
 	Mp3FileUrl    string             `bson:"mp3_file_url" json:"mp3_file_url"`
-	IsDeleted     bool               `bson:"is_deleted" json:"is_deleted"`
-	CreatedAt     time.Time          `bson:"created_at" json:"created_at"`
-	UpdatedAt     time.Time          `bson:"updated_at" json:"updated_at"`
-	DeletedAt     *time.Time         `bson:"deleted_at,omitempty" json:"deleted_at,omitempty"`
+	IsDeleted     bool               `bson:"is_deleted" json:"is_deleted"`                     // Soft delete flag
+	CreatedAt     time.Time          `bson:"created_at" json:"created_at"`                     // Creation timestamp
+	UpdatedAt     time.Time          `bson:"updated_at" json:"updated_at"`                     // Last update timestamp
+	DeletedAt     *time.Time         `bson:"deleted_at,omitempty" json:"deleted_at,omitempty"` // Deletion timestamp
 }
 
 // BeforeCreate sets the CreatedAt and UpdatedAt fields before creating a new track
@@ -42,4 +42,13 @@ func (t *Track) SoftDelete() {
 	t.UpdatedAt = now
 	t.DeletedAt = &now
 	t.IsDeleted = true
+}
+
+// PaginatedTracks represents a paginated list of tracks
+type PaginatedTracks struct {
+	Total      int64    `json:"total"`
+	Page       int      `json:"page"`
+	Limit      int      `json:"limit"`
+	TotalPages int      `json:"total_pages"`
+	Tracks     []*Track `json:"tracks"`
 }

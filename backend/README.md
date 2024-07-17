@@ -31,18 +31,18 @@
      ```
 
 2. **View Details of a Specific Music Track**
-   - **Endpoint:** `/api/tracks/:id` (GET)
+   - **Endpoint:** `/api/tracks/:trackId` (GET)
    - **Description:** View the details of a specific music track by its ID.
-   - **Request Parameters:** `id` - The ID of the music track.
+   - **Request Parameters:** `trackId` - The ID of the music track.
    - **Sample cURL Request:**
      ```bash
-      curl --location 'http://localhost:8080/api/tracks/66969d474132fbac97fcc672'
+     curl --location 'http://localhost:8080/api/tracks/60c72b2f9b1d8b6e9f3e9f3e'
      ```
 
 3. **Update an Existing Music Track**
-   - **Endpoint:** `/api/tracks/:id` (PUT)
+   - **Endpoint:** `/api/tracks/:trackId` (PUT)
    - **Description:** Update the details of an existing music track, including the cover image.
-   - **Request Parameters:** `id` - The ID of the music track.
+   - **Request Parameters:** `trackId` - The ID of the music track.
    - **Request Body:**
      - Form data with the following fields:
        - `title` (string, optional)
@@ -67,12 +67,12 @@
      ```
 
 4. **Delete a Music Track**
-   - **Endpoint:** `/api/tracks/:id` (DELETE)
+   - **Endpoint:** `/api/tracks/:trackId` (DELETE)
    - **Description:** Delete a music track from the library.
-   - **Request Parameters:** `id` - The ID of the music track.
+   - **Request Parameters:** `trackId` - The ID of the music track.
    - **Sample cURL Request:**
      ```bash
-      curl --location --request DELETE 'http://localhost:8080/api/tracks/669698214132fbac97fcc671'
+     curl --location --request DELETE 'http://localhost:8080/api/tracks/60c72b2f9b1d8b6e9f3e9f3e'
      ```
 
 5. **List All Music Tracks**
@@ -83,13 +83,13 @@
      - `limit` - The number of items per page (default is 10).
    - **Sample cURL Request:**
      ```bash
-      curl --location 'http://localhost:8080/api/tracks?page=1&limit=10'
+     curl --location 'http://localhost:8080/api/tracks?page=1&limit=10'
      ```
 
 6. **Play/Pause an MP3 File of a Music Track**
-   - **Endpoint:** `/api/tracks/:id/play` (POST)
+   - **Endpoint:** `/api/tracks/:trackId/play` (POST)
    - **Description:** Play or pause the MP3 file of a specified music track.
-   - **Request Parameters:** `id` - The ID of the music track.
+   - **Request Parameters:** `trackId` - The ID of the music track.
    - **Request Body:**
      ```json
      {
@@ -114,9 +114,11 @@
      ```
    - **Sample cURL Request:**
      ```bash
-     curl -X POST http://localhost:8080/api/playlists -H "Content-Type: application/json" -d '{
-       "name": "Danh sách phát mới"
-     }'
+     curl --location 'http://localhost:8080/api/playlists' \
+      --header 'Content-Type: application/json' \
+      --data '{
+        "name": "Danh sách phát mới"
+      }'
      ```
 
 8. **Add a Track to a Playlist**
@@ -127,10 +129,58 @@
       - `trackId`: The ID of the music track.
     - **Sample cURL Request:**
       ```bash
-      curl -X POST http://localhost:8080/api/playlists/60c72b2f9b1d8b6e9f3e9f3e/tracks/60c72b2f9b1d8b6e9f3e9f3e
+      curl --location --request POST 'http://localhost:8080/api/playlists/60c72b2f9b1d8b6e9f3e9f3e/tracks/60c72b2f9b1d8b6e9f3e9f3e'
       ```
 
-9. **List All Playlists**
+9. **Remove a Track from a Playlist**
+    - **Endpoint:** `/api/playlists/:playlistId/tracks/:trackId` (DELETE)
+    - **Description:** Remove a music track from a specified playlist.
+    - **Request Parameters:**
+      - `playlistId`: The ID of the playlist.
+      - `trackId`: The ID of the music track.
+    - **Sample cURL Request:**
+      ```bash
+      curl --location --request DELETE 'http://localhost:8080/api/playlists/60c72b2f9b1d8b6e9f3e9f3e/tracks/60c72b2f9b1d8b6e9f3e9f3e'
+      ```
+
+10. **View Details of a Specific Playlist**
+    - **Endpoint:** `/api/playlists/:playlistId` (GET)
+    - **Description:** View the details of a specific playlist by its ID.
+    - **Request Parameters:** `playlistId` - The ID of the playlist.
+    - **Sample cURL Request:**
+      ```bash
+      curl --location 'http://localhost:8080/api/playlists/60c72b2f9b1d8b6e9f3e9f3e'
+      ```
+
+11. **Update an Existing Playlist**
+    - **Endpoint:** `/api/playlists/:playlistId` (PUT)
+    - **Description:** Update the details of an existing playlist.
+    - **Request Parameters:** `playlistId` - The ID of the playlist.
+    - **Request Body:**
+      ```json
+      {
+        "name": "Tên mới của danh sách phát"
+      }
+      ```
+    - **Sample cURL Request:**
+      ```bash
+      curl --location --request PUT 'http://localhost:8080/api/playlists/60c72b2f9b1d8b6e9f3e9f3e' \
+      --header 'Content-Type: application/json' \
+      --data '{
+        "name": "Tên mới của danh sách phát"
+      }'
+      ```
+
+12. **Delete a Playlist**
+    - **Endpoint:** `/api/playlists/:playlistId` (DELETE)
+    - **Description:** Delete a playlist from the library.
+    - **Request Parameters:** `playlistId` - The ID of the playlist.
+    - **Sample cURL Request:**
+      ```bash
+      curl --location --request DELETE 'http://localhost:8080/api/playlists/60c72b2f9b1d8b6e9f3e9f3e'
+      ```
+
+13. **List All Playlists**
     - **Endpoint:** `/api/playlists` (GET)
     - **Description:** Display a list of all playlists.
     - **Request Query Parameters:** 
@@ -138,10 +188,10 @@
       - `limit` - The number of items per page (default is 10).
     - **Sample cURL Request:**
       ```bash
-      curl -X GET http://localhost:8080/api/playlists?page=1&limit=10
+      curl --location 'http://localhost:8080/api/playlists?page=1&limit=10'
       ```
 
-10. **Search for Music Tracks and Playlists**
+14. **Search for Music Tracks and Playlists**
     - **Endpoint:** `/api/search` (GET)
     - **Description:** Search for music tracks and playlists by title, artist, album, or genre.
     - **Request Query Parameters:** 
@@ -153,7 +203,7 @@
       curl -X GET http://localhost:8080/api/search?query=B%C3%A0i%20h%C3%A1t&page=1&limit=10
       ```
 
-11. **List All Genres**
+15. **List All Genres**
     - **Endpoint:** `/api/genres` (GET)
     - **Description:** Provides a list of available genres.
     - **Sample cURL Request:**
