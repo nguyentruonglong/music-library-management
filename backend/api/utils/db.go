@@ -58,7 +58,7 @@ func GetDatabase(client *mongo.Client, cfg *config.Config) *mongo.Database {
 // InitializeCollections ensures that the required collections exist
 func InitializeCollections(db *mongo.Database) error {
 	// Define a list of required collections
-	collections := []string{"tracks", "playlists", "genres"}
+	collections := []string{"tracks", "playlists", "genres", "files"}
 
 	// Iterate over each collection name
 	for _, collection := range collections {

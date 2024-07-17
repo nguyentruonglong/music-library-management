@@ -16,12 +16,14 @@ import (
 // TrackController handles HTTP requests for tracks
 type TrackController struct {
 	trackService *services.TrackService // A reference to the track service
+	fileService  *services.FileService  // A reference to the file service
 }
 
 // NewTrackController creates a new TrackController
-func NewTrackController(trackService *services.TrackService) *TrackController {
+func NewTrackController(trackService *services.TrackService, fileService *services.FileService) *TrackController {
 	return &TrackController{
 		trackService: trackService, // Initialize the track service
+		fileService:  fileService,  // Initialize the file service
 	}
 }
 
@@ -109,13 +111,22 @@ func (tc *TrackController) AddTrack(c *gin.Context) {
 		errors.HandleError(c, http.StatusBadRequest, errors.ErrInvalidInput) // Handle errors if the cover image is not provided
 		return
 	}
-	coverImageExt := filepath.Ext(coverImage.Filename)                     // Get the file extension
-	coverImagePath := "uploads/" + uuid.New().String() + coverImageExt     // Generate a unique file path
-	if err := c.SaveUploadedFile(coverImage, coverImagePath); err != nil { // Save the cover image file
+	coverImageExt := filepath.Ext(coverImage.Filename)                      // Get the file extension
+	coverImageName := uuid.New().String() + coverImageExt                   // Generate a unique file name
+	coverImagePath := tc.fileService.GetUploadPath() + "/" + coverImageName // Generate a unique file path
+	if err := c.SaveUploadedFile(coverImage, coverImagePath); err != nil {  // Save the cover image file
 		errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer) // Handle errors if saving fails
 		return
 	}
 	track.CoverImageUrl = c.Request.Host + "/" + coverImagePath // Set the cover image URL
+
+	// Save cover image metadata
+	_, err = tc.fileService.SaveFileMetadata(coverImageName)
+	if err != nil {
+		os.Remove(coverImagePath) // Remove the uploaded cover image file
+		errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer)
+		return
+	}
 
 	// Handle MP3 file upload
 	mp3File, err := c.FormFile("mp3_file") // Get the MP3 file
@@ -124,14 +135,24 @@ func (tc *TrackController) AddTrack(c *gin.Context) {
 		errors.HandleError(c, http.StatusBadRequest, errors.ErrInvalidInput) // Handle errors if the MP3 file is not provided
 		return
 	}
-	mp3FileExt := filepath.Ext(mp3File.Filename)                     // Get the file extension
-	mp3FilePath := "uploads/" + uuid.New().String() + mp3FileExt     // Generate a unique file path
-	if err := c.SaveUploadedFile(mp3File, mp3FilePath); err != nil { // Save the MP3 file
+	mp3FileExt := filepath.Ext(mp3File.Filename)                      // Get the file extension
+	mp3FileName := uuid.New().String() + mp3FileExt                   // Generate a unique file name
+	mp3FilePath := tc.fileService.GetUploadPath() + "/" + mp3FileName // Generate a unique file path
+	if err := c.SaveUploadedFile(mp3File, mp3FilePath); err != nil {  // Save the MP3 file
 		os.Remove(coverImagePath)                                                       // Remove the uploaded cover image file
 		errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer) // Handle errors if saving fails
 		return
 	}
 	track.Mp3FileUrl = c.Request.Host + "/" + mp3FilePath // Set the MP3 file URL
+
+	// Save MP3 file metadata
+	_, err = tc.fileService.SaveFileMetadata(mp3FileName)
+	if err != nil {
+		os.Remove(coverImagePath) // Remove the uploaded cover image file
+		os.Remove(mp3FilePath)    // Remove the uploaded MP3 file
+		errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer)
+		return
+	}
 
 	// Add track to the database
 	createdTrack, err := tc.trackService.AddTrack(&track) // Call service to add the track
@@ -226,25 +247,44 @@ func (tc *TrackController) UpdateTrack(c *gin.Context) {
 	coverImage, err := c.FormFile("cover_image") // Get the cover image file
 	if err == nil {
 		coverImageExt := filepath.Ext(coverImage.Filename)                     // Get the file extension
-		coverImagePath = "uploads/" + uuid.New().String() + coverImageExt      // Generate a unique file path
+		coverImageName := uuid.New().String() + coverImageExt                  // Generate a unique file name
+		coverImagePath = tc.fileService.GetUploadPath() + "/" + coverImageName // Generate a unique file path
 		if err := c.SaveUploadedFile(coverImage, coverImagePath); err != nil { // Save the cover image file
 			errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer) // Handle errors if saving fails
 			return
 		}
 		updatedTrack.CoverImageUrl = c.Request.Host + "/" + coverImagePath // Set the cover image URL
+
+		// Save cover image metadata
+		_, err = tc.fileService.SaveFileMetadata(coverImageName)
+		if err != nil {
+			os.Remove(coverImagePath) // Remove the uploaded cover image file
+			errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer)
+			return
+		}
 	}
 
 	// Handle MP3 file upload
 	mp3File, err := c.FormFile("mp3_file") // Get the MP3 file
 	if err == nil {
 		mp3FileExt := filepath.Ext(mp3File.Filename)                     // Get the file extension
-		mp3FilePath = "uploads/" + uuid.New().String() + mp3FileExt      // Generate a unique file path
+		mp3FileName := uuid.New().String() + mp3FileExt                  // Generate a unique file name
+		mp3FilePath = tc.fileService.GetUploadPath() + "/" + mp3FileName // Generate a unique file path
 		if err := c.SaveUploadedFile(mp3File, mp3FilePath); err != nil { // Save the MP3 file
 			os.Remove(coverImagePath)                                                       // Remove the uploaded cover image file
 			errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer) // Handle errors if saving fails
 			return
 		}
 		updatedTrack.Mp3FileUrl = c.Request.Host + "/" + mp3FilePath // Set the MP3 file URL
+
+		// Save MP3 file metadata
+		_, err = tc.fileService.SaveFileMetadata(mp3FileName)
+		if err != nil {
+			os.Remove(coverImagePath) // Remove the uploaded cover image file
+			os.Remove(mp3FilePath)    // Remove the uploaded MP3 file
+			errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer)
+			return
+		}
 	}
 
 	// Update track in the database

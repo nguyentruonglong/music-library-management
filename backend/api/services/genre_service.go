@@ -134,8 +134,9 @@ func (s *GenreService) DeleteGenre(genreId string) error {
 func (s *GenreService) ListGenres(page, limit int) ([]*models.Genre, int64, error) {
 	skip := (page - 1) * limit
 	findOptions := options.Find()
-	findOptions.SetSkip(int64(skip))   // Set the number of documents to skip
-	findOptions.SetLimit(int64(limit)) // Set the number of documents to return
+	findOptions.SetSkip(int64(skip))                            // Set the number of documents to skip
+	findOptions.SetLimit(int64(limit))                          // Set the number of documents to return
+	findOptions.SetSort(bson.D{{Key: "created_at", Value: -1}}) // Sort by created_at in descending order
 
 	cursor, err := s.collection.Find(context.Background(), bson.M{"is_deleted": false}, findOptions) // Find genres
 	if err != nil {
