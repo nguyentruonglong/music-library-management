@@ -6,7 +6,6 @@ import (
 	"music-library-management/api/utils"
 	"music-library-management/errors"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,15 +22,35 @@ func NewPlaylistController(playlistService *services.PlaylistService) *PlaylistC
 	}
 }
 
+// AddPlaylistInput represents the input data for adding a new playlist
+type AddPlaylistInput struct {
+	Name string `json:"name" binding:"required"`
+}
+
+// UpdatePlaylistInput represents the input data for updating a playlist
+type UpdatePlaylistInput struct {
+	Name string `json:"name" binding:"required"`
+}
+
+// ListPlaylistsInput represents the input data for listing playlists
+type ListPlaylistsInput struct {
+	Page  int `form:"page"`
+	Limit int `form:"limit"`
+}
+
 // AddPlaylist handles adding a new playlist
 func (pc *PlaylistController) AddPlaylist(c *gin.Context) {
+	var input AddPlaylistInput
 	var playlist models.Playlist
 
-	// Bind JSON input to the playlist model
-	if err := c.ShouldBindJSON(&playlist); err != nil {
-		errors.HandleError(c, http.StatusBadRequest, err)
+	// Bind JSON input to the AddPlaylistInput struct
+	if err := c.ShouldBindJSON(&input); err != nil {
+		errors.HandleError(c, http.StatusBadRequest, errors.ErrInvalidInput)
 		return
 	}
+
+	// Copy input data to playlist model
+	playlist.Name = input.Name
 
 	// Call service to add the playlist
 	createdPlaylist, err := pc.playlistService.AddPlaylist(&playlist)
@@ -47,10 +66,10 @@ func (pc *PlaylistController) AddPlaylist(c *gin.Context) {
 
 // GetPlaylist handles retrieving a playlist by ID
 func (pc *PlaylistController) GetPlaylist(c *gin.Context) {
-	id := c.Param("playlistId")
+	playlistId := c.Param("playlistId")
 
 	// Call service to get the playlist
-	playlist, err := pc.playlistService.GetPlaylist(id)
+	playlist, err := pc.playlistService.GetPlaylist(playlistId)
 	if err != nil {
 		errors.HandleError(c, http.StatusNotFound, err)
 		return
@@ -63,24 +82,29 @@ func (pc *PlaylistController) GetPlaylist(c *gin.Context) {
 
 // UpdatePlaylist handles updating an existing playlist
 func (pc *PlaylistController) UpdatePlaylist(c *gin.Context) {
-	id := c.Param("playlistId")
+	playlistId := c.Param("playlistId")
 
 	// Check if the playlist exists
-	_, err := pc.playlistService.GetPlaylist(id)
+	_, err := pc.playlistService.GetPlaylist(playlistId)
 	if err != nil {
 		errors.HandleError(c, http.StatusNotFound, err)
 		return
 	}
 
+	var input UpdatePlaylistInput
 	var updatedPlaylist models.Playlist
-	// Bind JSON input to the updated playlist model
-	if err := c.ShouldBindJSON(&updatedPlaylist); err != nil {
-		errors.HandleError(c, http.StatusBadRequest, err)
+
+	// Bind JSON input to the UpdatePlaylistInput struct
+	if err := c.ShouldBindJSON(&input); err != nil {
+		errors.HandleError(c, http.StatusBadRequest, errors.ErrInvalidInput)
 		return
 	}
 
+	// Copy input data to updatedPlaylist model
+	updatedPlaylist.Name = input.Name
+
 	// Call service to update the playlist
-	playlist, err := pc.playlistService.UpdatePlaylist(id, &updatedPlaylist)
+	playlist, err := pc.playlistService.UpdatePlaylist(playlistId, &updatedPlaylist)
 	if err != nil {
 		errors.HandleError(c, http.StatusInternalServerError, err)
 		return
@@ -93,10 +117,10 @@ func (pc *PlaylistController) UpdatePlaylist(c *gin.Context) {
 
 // DeletePlaylist handles deleting a playlist
 func (pc *PlaylistController) DeletePlaylist(c *gin.Context) {
-	id := c.Param("playlistId")
+	playlistId := c.Param("playlistId")
 
 	// Call service to delete the playlist
-	err := pc.playlistService.DeletePlaylist(id)
+	err := pc.playlistService.DeletePlaylist(playlistId)
 	if err != nil {
 		errors.HandleError(c, http.StatusInternalServerError, err)
 		return
@@ -109,12 +133,23 @@ func (pc *PlaylistController) DeletePlaylist(c *gin.Context) {
 
 // ListPlaylists handles listing all playlists with pagination
 func (pc *PlaylistController) ListPlaylists(c *gin.Context) {
-	// Parse pagination parameters from query
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	var input ListPlaylistsInput
+
+	// Bind query parameters to ListPlaylistsInput struct
+	if err := c.ShouldBindQuery(&input); err != nil {
+		errors.HandleError(c, http.StatusBadRequest, errors.ErrInvalidInput)
+		return
+	}
+
+	if input.Page == 0 {
+		input.Page = 1
+	}
+	if input.Limit == 0 {
+		input.Limit = 10
+	}
 
 	// Call service to list playlists
-	playlists, err := pc.playlistService.ListPlaylists(page, limit)
+	playlists, err := pc.playlistService.ListPlaylists(input.Page, input.Limit)
 	if err != nil {
 		errors.HandleError(c, http.StatusInternalServerError, err)
 		return

@@ -40,8 +40,8 @@ func (s *PlaylistService) AddPlaylist(playlist *models.Playlist) (*models.Playli
 }
 
 // GetPlaylist retrieves a playlist by its ID
-func (s *PlaylistService) GetPlaylist(id string) (*models.Playlist, error) {
-	objectID, err := primitive.ObjectIDFromHex(id) // Convert string ID to ObjectID
+func (s *PlaylistService) GetPlaylist(playlistId string) (*models.Playlist, error) {
+	objectID, err := primitive.ObjectIDFromHex(playlistId) // Convert string ID to ObjectID
 	if err != nil {
 		return nil, errors.ErrInvalidObjectID
 	}
@@ -59,14 +59,14 @@ func (s *PlaylistService) GetPlaylist(id string) (*models.Playlist, error) {
 }
 
 // UpdatePlaylist updates an existing playlist
-func (s *PlaylistService) UpdatePlaylist(id string, updatedPlaylist *models.Playlist) (*models.Playlist, error) {
-	objectID, err := primitive.ObjectIDFromHex(id) // Convert string ID to ObjectID
+func (s *PlaylistService) UpdatePlaylist(playlistId string, updatedPlaylist *models.Playlist) (*models.Playlist, error) {
+	objectID, err := primitive.ObjectIDFromHex(playlistId) // Convert string ID to ObjectID
 	if err != nil {
 		return nil, errors.ErrInvalidObjectID
 	}
 
 	// Retrieve the existing playlist to preserve the old values
-	existingPlaylist, err := s.GetPlaylist(id)
+	existingPlaylist, err := s.GetPlaylist(playlistId)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (s *PlaylistService) UpdatePlaylist(id string, updatedPlaylist *models.Play
 		"$set": updatedPlaylist, // Set updated playlist values
 	}
 
-	result := s.collection.FindOneAndUpdate(context.Background(), filter, update, options.FindOneAndUpdate().SetReturnDocument(options.After)) // Update playlist in the database and return updated document
+	result := s.collection.FindOneAndUpdate(context.Background(), filter, update, options.FindOneAndUpdate().SetReturnDocument(options.After)) // Update playlist in the database and return the updated document
 	if result.Err() != nil {
 		return nil, errors.ErrDatabaseOperation
 	}
@@ -99,14 +99,14 @@ func (s *PlaylistService) UpdatePlaylist(id string, updatedPlaylist *models.Play
 }
 
 // DeletePlaylist soft deletes a playlist by setting is_deleted to true
-func (s *PlaylistService) DeletePlaylist(id string) error {
-	objectID, err := primitive.ObjectIDFromHex(id) // Convert string ID to ObjectID
+func (s *PlaylistService) DeletePlaylist(playlistId string) error {
+	objectID, err := primitive.ObjectIDFromHex(playlistId) // Convert string ID to ObjectID
 	if err != nil {
 		return errors.ErrInvalidObjectID
 	}
 
 	// Retrieve the existing playlist
-	playlist, err := s.GetPlaylist(id)
+	playlist, err := s.GetPlaylist(playlistId)
 	if err != nil {
 		return err
 	}

@@ -37,8 +37,8 @@ func (s *TrackService) AddTrack(track *models.Track) (*models.Track, error) {
 }
 
 // GetTrack retrieves a track by its ID
-func (s *TrackService) GetTrack(id string) (*models.Track, error) {
-	objectID, err := primitive.ObjectIDFromHex(id) // Convert string ID to ObjectID
+func (s *TrackService) GetTrack(trackId string) (*models.Track, error) {
+	objectID, err := primitive.ObjectIDFromHex(trackId) // Convert string ID to ObjectID
 	if err != nil {
 		return nil, errors.ErrInvalidObjectID
 	}
@@ -56,13 +56,13 @@ func (s *TrackService) GetTrack(id string) (*models.Track, error) {
 }
 
 // UpdateTrack updates an existing track
-func (s *TrackService) UpdateTrack(id string, updatedTrack *models.Track) (*models.Track, error) {
-	objectID, err := primitive.ObjectIDFromHex(id) // Convert string ID to ObjectID
+func (s *TrackService) UpdateTrack(trackId string, updatedTrack *models.Track) (*models.Track, error) {
+	objectID, err := primitive.ObjectIDFromHex(trackId) // Convert string ID to ObjectID
 	if err != nil {
 		return nil, errors.ErrInvalidObjectID
 	}
 
-	existingTrack, err := s.GetTrack(id) // Retrieve the existing track
+	existingTrack, err := s.GetTrack(trackId) // Retrieve the existing track
 	if err != nil {
 		return nil, err
 	}
@@ -116,8 +116,8 @@ func (s *TrackService) UpdateTrack(id string, updatedTrack *models.Track) (*mode
 }
 
 // DeleteTrack soft deletes a track by setting is_deleted to true
-func (s *TrackService) DeleteTrack(id string) error {
-	objectID, err := primitive.ObjectIDFromHex(id) // Convert string ID to ObjectID
+func (s *TrackService) DeleteTrack(trackId string) error {
+	objectID, err := primitive.ObjectIDFromHex(trackId) // Convert string ID to ObjectID
 	if err != nil {
 		return errors.ErrInvalidObjectID
 	}
@@ -185,7 +185,7 @@ func (s *TrackService) ListTracks(page, limit int) (*models.PaginatedTracks, err
 }
 
 // PlayPauseTrack plays or pauses a track based on the action provided
-func (s *TrackService) PlayPauseTrack(id string, action string) error {
+func (s *TrackService) PlayPauseTrack(trackId string, action string) error {
 	if action != "play" && action != "pause" { // Validate action
 		return errors.ErrBadRequest
 	}

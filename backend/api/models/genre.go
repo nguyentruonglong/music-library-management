@@ -31,6 +31,7 @@ func (g *Genre) BeforeUpdate() {
 // SoftDelete sets the DeletedAt field to the current time and the IsDeleted field to true.
 func (g *Genre) SoftDelete() {
 	now := time.Now()
+	g.UpdatedAt = now
 	g.DeletedAt = &now
 	g.IsDeleted = true
 }

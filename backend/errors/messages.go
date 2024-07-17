@@ -14,6 +14,7 @@ var (
 	ErrPlaylistNotFound       = errors.New("playlist not found")                   // Error when a playlist is not found
 	ErrTrackAlreadyInPlaylist = errors.New("track already exists in the playlist") // Error when a track is already in a playlist
 	ErrTrackNotInPlaylist     = errors.New("track does not exist in the playlist") // Error when a track is not in a playlist
+	ErrInvalidInput           = errors.New("invalid input")                        // Error for invalid input
 )
 
 // CustomError represents a custom error type

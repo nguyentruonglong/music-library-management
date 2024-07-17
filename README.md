@@ -79,6 +79,7 @@ music-library-management/
 │   │   │   └── ...
 │   │   ├── utils/
 │   │   │   ├── db.go
+│   │   │   ├── response.go
 │   │   └── ...
 │   ├── middleware/
 │   │   ├── auth_middleware.go
