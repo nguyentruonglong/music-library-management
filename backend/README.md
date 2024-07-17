@@ -19,7 +19,7 @@
        - `mp3_file` (file, required)
    - **Sample cURL Request:**
      ```bash
-        curl --location 'http://localhost:8080/api/tracks/' \
+      curl --location 'http://localhost:8080/api/tracks/' \
       --form 'title="Bài hát mới"' \
       --form 'cover_image=@"/Users/nguyentruonglong/Desktop/retro-wave-music.jpg"' \
       --form 'artist="Ca sĩ A"' \
@@ -55,7 +55,7 @@
        - `mp3_file` (file, optional)
    - **Sample cURL Request:**
      ```bash
-        curl --location --request PUT 'http://localhost:8080/api/tracks/6696847da3b2ae928a1b9c7e' \
+      curl --location --request PUT 'http://localhost:8080/api/tracks/6696847da3b2ae928a1b9c7e' \
       --form 'title="Bài hát cập nhật"' \
       --form 'cover_image=@"/Users/nguyentruonglong/Desktop/retro-wave-music.jpg"' \
       --form 'artist="Ca sĩ B"' \
@@ -208,5 +208,5 @@
     - **Description:** Provides a list of available genres.
     - **Sample cURL Request:**
       ```bash
-      curl -X GET http://localhost:8080/api/genres
+      curl --location 'http://localhost:8080/api/genres/'
       ```

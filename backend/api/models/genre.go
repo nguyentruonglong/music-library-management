@@ -21,6 +21,7 @@ func (g *Genre) BeforeCreate() {
 	now := time.Now()
 	g.CreatedAt = now
 	g.UpdatedAt = now
+	g.IsDeleted = false
 }
 
 // BeforeUpdate sets the UpdatedAt field to the current time before updating an existing genre.

@@ -12,6 +12,7 @@ var (
 	ErrDatabaseOperation      = errors.New("database operation failed")            // Error for database operation failures
 	ErrTrackNotFound          = errors.New("track not found")                      // Error when a track is not found
 	ErrPlaylistNotFound       = errors.New("playlist not found")                   // Error when a playlist is not found
+	ErrGenreNotFound          = errors.New("genre not found")                      // Error when a genre is not found
 	ErrTrackAlreadyInPlaylist = errors.New("track already exists in the playlist") // Error when a track is already in a playlist
 	ErrTrackNotInPlaylist     = errors.New("track does not exist in the playlist") // Error when a track is not in a playlist
 	ErrInvalidInput           = errors.New("invalid input")                        // Error for invalid input

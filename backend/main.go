@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"music-library-management/api/controllers"
-	// "music-library-management/api/middleware"
 	"music-library-management/api/routes"
 	"music-library-management/api/services"
 	"music-library-management/api/utils"
@@ -41,6 +40,9 @@ func main() {
 		log.Fatalf("Error initializing collections: %v", err)
 	}
 
+	// Seed genres collection with sample data
+	utils.SeedGenres(client, cfg)
+
 	// Initialize Gin router
 	router := gin.Default()
 
@@ -57,9 +59,13 @@ func main() {
 	playlistService := services.NewPlaylistService(client, cfg, trackService)
 	playlistController := controllers.NewPlaylistController(playlistService)
 
+	genreService := services.NewGenreService(client, cfg)
+	genreController := controllers.NewGenreController(genreService)
+
 	// Initialize routes
 	routes.TrackRoutes(router, trackController)
 	routes.PlaylistRoutes(router, playlistController)
+	routes.GenreRoutes(router, genreController)
 
 	// Start the server
 	log.Fatal(router.Run(":" + cfg.Port))
