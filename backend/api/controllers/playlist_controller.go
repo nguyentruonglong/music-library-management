@@ -38,6 +38,20 @@ type ListPlaylistsInput struct {
 	Limit int `form:"limit"`
 }
 
+// PlaylistOutput represents the output data for a playlist
+type PlaylistOutput struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// PaginatedPlaylistsOutput represents the output data for paginated playlists
+type PaginatedPlaylistsOutput struct {
+	Page       int              `json:"page"`
+	Limit      int              `json:"limit"`
+	TotalCount int64            `json:"total_count"`
+	Playlists  []PlaylistOutput `json:"playlists"`
+}
+
 // AddPlaylist handles adding a new playlist
 func (pc *PlaylistController) AddPlaylist(c *gin.Context) {
 	var input AddPlaylistInput
@@ -59,8 +73,14 @@ func (pc *PlaylistController) AddPlaylist(c *gin.Context) {
 		return
 	}
 
+	// Prepare output data
+	output := PlaylistOutput{
+		ID:   createdPlaylist.ID.Hex(),
+		Name: createdPlaylist.Name,
+	}
+
 	// Respond with success message and created playlist
-	response := utils.NewSuccessResponse("Playlist added successfully", createdPlaylist)
+	response := utils.NewSuccessResponse("Playlist added successfully", output)
 	c.JSON(http.StatusCreated, response)
 }
 
@@ -75,8 +95,14 @@ func (pc *PlaylistController) GetPlaylist(c *gin.Context) {
 		return
 	}
 
+	// Prepare output data
+	output := PlaylistOutput{
+		ID:   playlist.ID.Hex(),
+		Name: playlist.Name,
+	}
+
 	// Respond with success message and retrieved playlist
-	response := utils.NewSuccessResponse("Playlist retrieved successfully", playlist)
+	response := utils.NewSuccessResponse("Playlist retrieved successfully", output)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -110,8 +136,14 @@ func (pc *PlaylistController) UpdatePlaylist(c *gin.Context) {
 		return
 	}
 
+	// Prepare output data
+	output := PlaylistOutput{
+		ID:   playlist.ID.Hex(),
+		Name: playlist.Name,
+	}
+
 	// Respond with success message and updated playlist
-	response := utils.NewSuccessResponse("Playlist updated successfully", playlist)
+	response := utils.NewSuccessResponse("Playlist updated successfully", output)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -149,14 +181,29 @@ func (pc *PlaylistController) ListPlaylists(c *gin.Context) {
 	}
 
 	// Call service to list playlists
-	playlists, err := pc.playlistService.ListPlaylists(input.Page, input.Limit)
+	playlists, totalCount, err := pc.playlistService.ListPlaylists(input.Page, input.Limit)
 	if err != nil {
 		errors.HandleError(c, http.StatusInternalServerError, err)
 		return
 	}
 
+	// Prepare output data
+	output := PaginatedPlaylistsOutput{
+		Page:       input.Page,
+		Limit:      input.Limit,
+		TotalCount: totalCount,
+		Playlists:  make([]PlaylistOutput, len(playlists)),
+	}
+
+	for i, playlist := range playlists {
+		output.Playlists[i] = PlaylistOutput{
+			ID:   playlist.ID.Hex(),
+			Name: playlist.Name,
+		}
+	}
+
 	// Respond with success message and list of playlists
-	response := utils.NewSuccessResponse("Playlists retrieved successfully", playlists)
+	response := utils.NewSuccessResponse("Playlists retrieved successfully", output)
 	c.JSON(http.StatusOK, response)
 }
 

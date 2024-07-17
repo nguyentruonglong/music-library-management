@@ -131,7 +131,7 @@ func (s *PlaylistService) DeletePlaylist(playlistId string) error {
 }
 
 // ListPlaylists lists all playlists with pagination
-func (s *PlaylistService) ListPlaylists(page, limit int) (*models.PaginatedPlaylists, error) {
+func (s *PlaylistService) ListPlaylists(page, limit int) ([]*models.Playlist, int64, error) {
 	skip := (page - 1) * limit
 	findOptions := options.Find()
 	findOptions.SetSkip(int64(skip))   // Set the number of documents to skip
@@ -139,29 +139,21 @@ func (s *PlaylistService) ListPlaylists(page, limit int) (*models.PaginatedPlayl
 
 	cursor, err := s.collection.Find(context.Background(), bson.M{"is_deleted": false}, findOptions) // Find playlists
 	if err != nil {
-		return nil, errors.ErrDatabaseOperation
+		return nil, 0, errors.ErrDatabaseOperation
 	}
 
 	var playlists []*models.Playlist
 	err = cursor.All(context.Background(), &playlists) // Decode all playlists
 	if err != nil {
-		return nil, errors.ErrDatabaseOperation
+		return nil, 0, errors.ErrDatabaseOperation
 	}
 
-	total, err := s.collection.CountDocuments(context.Background(), bson.M{"is_deleted": false})
+	total, err := s.collection.CountDocuments(context.Background(), bson.M{"is_deleted": false}) // Get the total number of playlists
 	if err != nil {
-		return nil, errors.ErrDatabaseOperation
+		return nil, 0, errors.ErrDatabaseOperation
 	}
 
-	paginatedPlaylists := &models.PaginatedPlaylists{
-		Total:      total,
-		Page:       page,
-		Limit:      limit,
-		TotalPages: int((total + int64(limit) - 1) / int64(limit)),
-		Playlists:  playlists,
-	}
-
-	return paginatedPlaylists, nil
+	return playlists, total, nil
 }
 
 // AddTrackToPlaylist adds a track to a playlist

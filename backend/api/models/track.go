@@ -43,12 +43,3 @@ func (t *Track) SoftDelete() {
 	t.DeletedAt = &now
 	t.IsDeleted = true
 }
-
-// PaginatedTracks represents a paginated list of tracks
-type PaginatedTracks struct {
-	Total      int64    `json:"total"`
-	Page       int      `json:"page"`
-	Limit      int      `json:"limit"`
-	TotalPages int      `json:"total_pages"`
-	Tracks     []*Track `json:"tracks"`
-}

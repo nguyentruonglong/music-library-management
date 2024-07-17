@@ -150,7 +150,7 @@ func (s *TrackService) DeleteTrack(trackId string) error {
 }
 
 // ListTracks lists all tracks with pagination
-func (s *TrackService) ListTracks(page, limit int) (*models.PaginatedTracks, error) {
+func (s *TrackService) ListTracks(page, limit int) ([]*models.Track, int64, error) {
 	skip := (page - 1) * limit // Calculate the number of documents to skip
 	findOptions := options.Find()
 	findOptions.SetSkip(int64(skip))   // Set the number of documents to skip
@@ -158,30 +158,21 @@ func (s *TrackService) ListTracks(page, limit int) (*models.PaginatedTracks, err
 
 	cursor, err := s.collection.Find(context.Background(), bson.M{"is_deleted": false}, findOptions) // Find tracks
 	if err != nil {
-		return nil, errors.ErrDatabaseOperation
+		return nil, 0, errors.ErrDatabaseOperation
 	}
 
 	var tracks []*models.Track
 	err = cursor.All(context.Background(), &tracks) // Decode all tracks
 	if err != nil {
-		return nil, errors.ErrDatabaseOperation
+		return nil, 0, errors.ErrDatabaseOperation
 	}
 
 	total, err := s.collection.CountDocuments(context.Background(), bson.M{"is_deleted": false}) // Get the total number of tracks
 	if err != nil {
-		return nil, errors.ErrDatabaseOperation
+		return nil, 0, errors.ErrDatabaseOperation
 	}
 
-	// Create a PaginatedTracks response
-	paginatedTracks := &models.PaginatedTracks{
-		Total:      total,
-		Page:       page,
-		Limit:      limit,
-		TotalPages: int((total + int64(limit) - 1) / int64(limit)),
-		Tracks:     tracks,
-	}
-
-	return paginatedTracks, nil
+	return tracks, total, nil
 }
 
 // PlayPauseTrack plays or pauses a track based on the action provided

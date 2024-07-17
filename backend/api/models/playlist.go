@@ -38,12 +38,3 @@ func (p *Playlist) SoftDelete() {
 	p.DeletedAt = &now
 	p.IsDeleted = true
 }
-
-// PaginatedPlaylists represents paginated data for playlists
-type PaginatedPlaylists struct {
-	Total      int64       `json:"total"`
-	Page       int         `json:"page"`
-	Limit      int         `json:"limit"`
-	TotalPages int         `json:"totalPages"`
-	Playlists  []*Playlist `json:"playlists"`
-}

@@ -55,6 +55,27 @@ type PlayPauseTrackInput struct {
 	Action string `json:"action" binding:"required,oneof=play pause"`
 }
 
+// TrackOutput represents the output data for a track
+type TrackOutput struct {
+	ID            string `json:"id"`
+	Title         string `json:"title"`
+	Artist        string `json:"artist"`
+	Album         string `json:"album"`
+	Genre         string `json:"genre"`
+	ReleaseYear   int    `json:"release_year"`
+	Duration      int    `json:"duration"`
+	CoverImageUrl string `json:"cover_image_url"`
+	Mp3FileUrl    string `json:"mp3_file_url"`
+}
+
+// PaginatedTracksOutput represents the output data for paginated tracks
+type PaginatedTracksOutput struct {
+	Page       int           `json:"page"`
+	Limit      int           `json:"limit"`
+	TotalCount int64         `json:"total_count"`
+	Tracks     []TrackOutput `json:"tracks"`
+}
+
 // AddTrack handles adding a new track
 func (tc *TrackController) AddTrack(c *gin.Context) {
 	var input AddTrackInput
@@ -120,7 +141,20 @@ func (tc *TrackController) AddTrack(c *gin.Context) {
 		return
 	}
 
-	response := utils.NewSuccessResponse("Track added successfully", createdTrack)
+	// Prepare output data
+	output := TrackOutput{
+		ID:            createdTrack.ID.Hex(),
+		Title:         createdTrack.Title,
+		Artist:        createdTrack.Artist,
+		Album:         createdTrack.Album,
+		Genre:         createdTrack.Genre,
+		ReleaseYear:   createdTrack.ReleaseYear,
+		Duration:      createdTrack.Duration,
+		CoverImageUrl: createdTrack.CoverImageUrl,
+		Mp3FileUrl:    createdTrack.Mp3FileUrl,
+	}
+
+	response := utils.NewSuccessResponse("Track added successfully", output)
 	c.JSON(http.StatusCreated, response)
 }
 
@@ -134,7 +168,20 @@ func (tc *TrackController) GetTrack(c *gin.Context) {
 		return
 	}
 
-	response := utils.NewSuccessResponse("Track retrieved successfully", track)
+	// Prepare output data
+	output := TrackOutput{
+		ID:            track.ID.Hex(),
+		Title:         track.Title,
+		Artist:        track.Artist,
+		Album:         track.Album,
+		Genre:         track.Genre,
+		ReleaseYear:   track.ReleaseYear,
+		Duration:      track.Duration,
+		CoverImageUrl: track.CoverImageUrl,
+		Mp3FileUrl:    track.Mp3FileUrl,
+	}
+
+	response := utils.NewSuccessResponse("Track retrieved successfully", output)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -208,7 +255,20 @@ func (tc *TrackController) UpdateTrack(c *gin.Context) {
 		return
 	}
 
-	response := utils.NewSuccessResponse("Track updated successfully", track)
+	// Prepare output data
+	output := TrackOutput{
+		ID:            track.ID.Hex(),
+		Title:         track.Title,
+		Artist:        track.Artist,
+		Album:         track.Album,
+		Genre:         track.Genre,
+		ReleaseYear:   track.ReleaseYear,
+		Duration:      track.Duration,
+		CoverImageUrl: track.CoverImageUrl,
+		Mp3FileUrl:    track.Mp3FileUrl,
+	}
+
+	response := utils.NewSuccessResponse("Track updated successfully", output)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -243,13 +303,36 @@ func (tc *TrackController) ListTracks(c *gin.Context) {
 		input.Limit = 10
 	}
 
-	tracks, err := tc.trackService.ListTracks(input.Page, input.Limit)
+	// Call service to list tracks
+	tracks, totalCount, err := tc.trackService.ListTracks(input.Page, input.Limit)
 	if err != nil {
 		errors.HandleError(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	response := utils.NewSuccessResponse("Tracks retrieved successfully", tracks)
+	// Prepare output data
+	output := PaginatedTracksOutput{
+		Page:       input.Page,
+		Limit:      input.Limit,
+		TotalCount: totalCount,
+		Tracks:     make([]TrackOutput, len(tracks)),
+	}
+
+	for i, track := range tracks {
+		output.Tracks[i] = TrackOutput{
+			ID:            track.ID.Hex(),
+			Title:         track.Title,
+			Artist:        track.Artist,
+			Album:         track.Album,
+			Genre:         track.Genre,
+			ReleaseYear:   track.ReleaseYear,
+			Duration:      track.Duration,
+			CoverImageUrl: track.CoverImageUrl,
+			Mp3FileUrl:    track.Mp3FileUrl,
+		}
+	}
+
+	response := utils.NewSuccessResponse("Tracks retrieved successfully", output)
 	c.JSON(http.StatusOK, response)
 }
 
