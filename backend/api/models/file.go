@@ -14,7 +14,7 @@ type File struct {
 	IsDeleted bool               `bson:"is_deleted" json:"is_deleted"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
-	DeletedAt time.Time          `bson:"deleted_at,omitempty" json:"deleted_at,omitempty"`
+	DeletedAt *time.Time         `bson:"deleted_at" json:"deleted_at"`
 }
 
 // BeforeCreate sets default values before creating a new file record
@@ -23,6 +23,7 @@ func (f *File) BeforeCreate() {
 	f.ID = primitive.NewObjectID()
 	f.CreatedAt = now
 	f.UpdatedAt = now
+	f.DeletedAt = nil
 	f.IsDeleted = false
 }
 
@@ -33,6 +34,8 @@ func (f *File) BeforeUpdate() {
 
 // SoftDelete marks the file record as deleted without removing it from the database
 func (f *File) SoftDelete() {
+	now := time.Now()
+	f.UpdatedAt = now
+	f.DeletedAt = &now
 	f.IsDeleted = true
-	f.DeletedAt = time.Now()
 }

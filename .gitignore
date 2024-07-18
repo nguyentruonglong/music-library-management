@@ -41,6 +41,8 @@ docker-compose.override.yml
 
 # Backend specific ignores
 /backend/coverage
+/backend/uploads/dev
+/backend/uploads/prod
 
 # Frontend specific ignores
 /frontend/coverage

@@ -10,18 +10,20 @@ import (
 type Playlist struct {
 	ID        primitive.ObjectID   `bson:"_id,omitempty" json:"id,omitempty"`
 	Name      string               `bson:"name" json:"name" binding:"required"`
-	Tracks    []primitive.ObjectID `bson:"tracks" json:"tracks"`                             // Tracks in the playlist
-	IsDeleted bool                 `bson:"is_deleted" json:"is_deleted"`                     // Soft delete flag
-	CreatedAt time.Time            `bson:"created_at" json:"created_at"`                     // Creation timestamp
-	UpdatedAt time.Time            `bson:"updated_at" json:"updated_at"`                     // Last update timestamp
-	DeletedAt *time.Time           `bson:"deleted_at,omitempty" json:"deleted_at,omitempty"` // Deletion timestamp
+	Tracks    []primitive.ObjectID `bson:"tracks" json:"tracks"`         // Tracks in the playlist
+	IsDeleted bool                 `bson:"is_deleted" json:"is_deleted"` // Soft delete flag
+	CreatedAt time.Time            `bson:"created_at" json:"created_at"` // Creation timestamp
+	UpdatedAt time.Time            `bson:"updated_at" json:"updated_at"` // Last update timestamp
+	DeletedAt *time.Time           `bson:"deleted_at" json:"deleted_at"` // Deletion timestamp
 }
 
 // BeforeCreate sets the CreatedAt, UpdatedAt fields and initializes Tracks before creating a new playlist
 func (p *Playlist) BeforeCreate() {
+	now := time.Now()
 	p.ID = primitive.NewObjectID()
-	p.CreatedAt = time.Now()
-	p.UpdatedAt = time.Now()
+	p.CreatedAt = now
+	p.UpdatedAt = now
+	p.DeletedAt = nil
 	p.IsDeleted = false
 	p.Tracks = []primitive.ObjectID{} // Initialize Tracks as an empty array
 }
