@@ -35,9 +35,15 @@ func LoadConfig() (*Config, error) {
 		fmt.Printf("No %s file found, reading configuration from environment variables\n", envFile) // Print a message if the .env file is not found
 	}
 
+	// Set MongoHost based on whether the application is running inside Docker
+	mongoHost := getEnv("MONGO_HOST", "")
+	if os.Getenv("RUNNING_IN_DOCKER") == "true" {
+		mongoHost = "mongo" // Use the Docker service name for MongoDB
+	}
+
 	// Read environment variables into the Config struct
 	config := &Config{
-		MongoHost:  getEnv("MONGO_HOST", ""),  // Get the value of MONGO_HOST or use the default value
+		MongoHost:  mongoHost,                 // Set MongoDB host
 		MongoPort:  getEnv("MONGO_PORT", ""),  // Get the value of MONGO_PORT or use the default value
 		MongoDB:    getEnv("MONGO_DB", ""),    // Get the value of MONGO_DB or use the default value
 		Port:       getEnv("PORT", ""),        // Get the value of PORT or use the default value

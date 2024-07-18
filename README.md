@@ -1,5 +1,9 @@
 # Music Library Management Website
 
+## Description
+
+The Music Library Management system is a full-stack web application that allows users to organize and manage their music collections, including tracks and playlists. Users can add, update, search, and delete music tracks, upload mp3 files, view details of specific tracks, and manage playlists. The application provides a user-friendly interface with ReactJS and Ant Design for the frontend, and uses Golang with the Gin framework for the backend. MongoDB is used as the database.
+
 
 ### Project Directory Structure
 
@@ -45,7 +49,7 @@ music-library-management/
 │   │   │   ├── SearchPage.jsx              # Page for search results
 │   │   │   └── ...              
 │   │   ├── services/                       # Services for API calls and business logic
-│   │   │   ├── api.js                      # API service for HTTP requests
+│   │   │   ├── api.jsx                     # API service for HTTP requests
 │   │   │   └── ...              
 │   │   ├── App.jsx                         # Main App component
 │   │   ├── index.jsx                       # Entry point for the React application
@@ -88,6 +92,7 @@ music-library-management/
 │   │   │   ├── db.go                       # Database connection and setup
 │   │   │   ├── response.go                 # Helper for standardized responses
 │   │   │   ├── seed.go                     # Database seeding script
+│   │   │   ├── url.go                      # Helpers that assist in working with URLs
 │   │   └── ...              
 │   ├── middleware/                         # Middleware for request processing
 │   │   ├── auth_middleware.go              # Authentication middleware
@@ -111,3 +116,73 @@ music-library-management/
 ├── .dockerignore                           # Docker ignore file
 └── README.md                               # Project documentation
 ```
+
+## Prerequisites
+
+Ensure you have the following software installed on your machine:
+
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Node.js](https://nodejs.org/)
+
+## Environment Variables
+
+Set up your environment variables in the following files:
+
+- `.env.development` for development environment variables
+- `.env.production` for production environment variables
+
+## Running the Application with Docker
+
+### Build the Docker images
+
+To build the Docker images for the frontend and backend services, run the following command:
+
+```bash
+docker-compose -f docker-compose.yml build
+```
+
+### Start the Docker containers
+
+To start the application in detached mode, run the following command:
+
+```bash
+$ docker-compose -f docker-compose.yml up -d
+```
+
+This command will start the backend and MongoDB services.
+
+### Stopping the Docker containers
+
+To stop the running containers, run the following command:
+
+```bash
+$ docker-compose -f docker-compose.yml down
+```
+
+### Accessing the Application
+
+- Frontend: Open your web browser and navigate to http://localhost:3000
+- Backend: The backend API will be accessible at http://localhost:8080/api
+
+### Accessing MongoDB
+
+To access MongoDB using MongoDB Compass or any other MongoDB client, connect to:
+
+```bash
+$ mongodb://localhost:27017/musiclibrary
+```
+
+## Contributing
+
+Contributions are welcome! Please create a new issue or submit a pull request to contribute.
+
+## Credits
+
+- Author: Nguyen Truong Long
+
+## Contact
+
+If you have any questions or need further assistance, feel free to contact me.
+
+This [README.md](README.md) file provides a detailed guide to setting up and running your Music Library Management system using Docker, along with other conventional sections. Adjust the placeholders me and my email with your actual contact information.

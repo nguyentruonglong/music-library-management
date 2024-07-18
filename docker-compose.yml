@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # frontend:
+  #   container_name: frontend
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - REACT_APP_API_BASE_URL=http://backend:8080/api
+  #   depends_on:
+  #     - backend
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    volumes:
+      - ./backend/uploads:/app/uploads
+    environment:
+      - RUNNING_IN_DOCKER=true
+      - MONGO_URI=mongodb://mongo:27017/musiclibrary
+      - ENV=production
+    restart: always
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=musiclibrary

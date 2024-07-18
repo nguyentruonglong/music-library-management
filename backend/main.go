@@ -49,6 +49,9 @@ func main() {
 	// Set trusted proxies
 	router.SetTrustedProxies(nil) // Set trusted proxies to nil
 
+	// Disable trailing slash redirect
+	router.RemoveExtraSlash = true
+
 	// Middleware
 	// router.Use(middleware.CORSMiddleware()) // Uncomment this line to enable CORS middleware
 
@@ -79,5 +82,5 @@ func main() {
 	routes.SearchRoutes(router, searchController)     // Initialize search routes
 
 	// Start the server
-	log.Fatal(router.Run(":" + cfg.Port)) // Start the Gin server on the configured port and log any fatal errors
+	log.Fatal(router.Run("0.0.0.0:" + cfg.Port)) // Start the Gin server on all network interfaces and log any fatal errors
 }
