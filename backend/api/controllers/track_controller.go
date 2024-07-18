@@ -118,10 +118,10 @@ func (tc *TrackController) AddTrack(c *gin.Context) {
 		errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer) // Handle errors if saving fails
 		return
 	}
-	track.CoverImageUrl = c.Request.Host + "/" + coverImagePath // Set the cover image URL
+	track.CoverImageUrl = utils.GetScheme(c) + "://" + c.Request.Host + "/" + coverImagePath // Set the cover image URL
 
 	// Save cover image metadata
-	_, err = tc.fileService.SaveFileMetadata(coverImageName)
+	_, err = tc.fileService.SaveFileMetadata(c, coverImageName)
 	if err != nil {
 		os.Remove(coverImagePath) // Remove the uploaded cover image file
 		errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer)
@@ -143,10 +143,10 @@ func (tc *TrackController) AddTrack(c *gin.Context) {
 		errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer) // Handle errors if saving fails
 		return
 	}
-	track.Mp3FileUrl = c.Request.Host + "/" + mp3FilePath // Set the MP3 file URL
+	track.Mp3FileUrl = utils.GetScheme(c) + "://" + c.Request.Host + "/" + mp3FilePath // Set the MP3 file URL
 
 	// Save MP3 file metadata
-	_, err = tc.fileService.SaveFileMetadata(mp3FileName)
+	_, err = tc.fileService.SaveFileMetadata(c, mp3FileName)
 	if err != nil {
 		os.Remove(coverImagePath) // Remove the uploaded cover image file
 		os.Remove(mp3FilePath)    // Remove the uploaded MP3 file
@@ -253,10 +253,10 @@ func (tc *TrackController) UpdateTrack(c *gin.Context) {
 			errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer) // Handle errors if saving fails
 			return
 		}
-		updatedTrack.CoverImageUrl = c.Request.Host + "/" + coverImagePath // Set the cover image URL
+		updatedTrack.CoverImageUrl = utils.GetScheme(c) + "://" + c.Request.Host + "/" + coverImagePath // Set the cover image URL
 
 		// Save cover image metadata
-		_, err = tc.fileService.SaveFileMetadata(coverImageName)
+		_, err = tc.fileService.SaveFileMetadata(c, coverImageName)
 		if err != nil {
 			os.Remove(coverImagePath) // Remove the uploaded cover image file
 			errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer)
@@ -275,10 +275,10 @@ func (tc *TrackController) UpdateTrack(c *gin.Context) {
 			errors.HandleError(c, http.StatusInternalServerError, errors.ErrInternalServer) // Handle errors if saving fails
 			return
 		}
-		updatedTrack.Mp3FileUrl = c.Request.Host + "/" + mp3FilePath // Set the MP3 file URL
+		updatedTrack.Mp3FileUrl = utils.GetScheme(c) + "://" + c.Request.Host + "/" + mp3FilePath // Set the MP3 file URL
 
 		// Save MP3 file metadata
-		_, err = tc.fileService.SaveFileMetadata(mp3FileName)
+		_, err = tc.fileService.SaveFileMetadata(c, mp3FileName)
 		if err != nil {
 			os.Remove(coverImagePath) // Remove the uploaded cover image file
 			os.Remove(mp3FilePath)    // Remove the uploaded MP3 file

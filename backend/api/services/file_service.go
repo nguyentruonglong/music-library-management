@@ -2,10 +2,13 @@ package services
 
 import (
 	"context"
+
 	"music-library-management/api/models"
 	"music-library-management/api/utils"
 	"music-library-management/config"
 	"music-library-management/errors"
+
+	"github.com/gin-gonic/gin"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -32,10 +35,13 @@ func (s *FileService) GetUploadPath() string {
 }
 
 // SaveFileMetadata saves metadata for an uploaded file
-func (s *FileService) SaveFileMetadata(filename string) (*models.File, error) {
+func (s *FileService) SaveFileMetadata(c *gin.Context, filename string) (*models.File, error) {
+	fileUrl := utils.GetScheme(c) + "://" + c.Request.Host + "/" + s.GetUploadPath() + "/" + filename
+
 	file := &models.File{
 		Filename: filename,
 		Filepath: s.GetUploadPath() + "/" + filename,
+		FileUrl:  fileUrl,
 	}
 	file.BeforeCreate() // Set default values before creating the file record
 

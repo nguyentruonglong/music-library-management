@@ -11,6 +11,7 @@ type File struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	Filename  string             `bson:"filename" json:"filename"`
 	Filepath  string             `bson:"filepath" json:"filepath"`
+	FileUrl   string             `bson:"file_url" json:"file_url"`
 	IsDeleted bool               `bson:"is_deleted" json:"is_deleted"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`

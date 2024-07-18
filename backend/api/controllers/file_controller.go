@@ -32,6 +32,7 @@ type FileOutput struct {
 	ID       string `json:"id"`       // The ID of the file
 	Filename string `json:"filename"` // The filename of the file
 	Filepath string `json:"filepath"` // The filepath of the file
+	FileUrl  string `json:"file_url"` // The file url of the file
 }
 
 // PaginatedFilesOutput represents the output data for paginated files
@@ -74,6 +75,7 @@ func (fc *FileController) ListFiles(c *gin.Context) {
 			ID:       file.ID.Hex(),
 			Filename: file.Filename,
 			Filepath: file.Filepath,
+			FileUrl:  file.FileUrl,
 		}
 	}
 

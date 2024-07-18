@@ -1,5 +1,31 @@
 # Music Library Management Backend
 
+## Steps to Run the Application
+
+### Clone the Repository
+```bash
+$ git clone https://github.com/nguyentruonglong/music-library-management.git
+$ cd music-library-management
+```
+
+### Set Up Environment Variables
+
+Create a .env.development file in both backend/ and frontend/ directories and add the necessary configurations.
+
+### Run MongoDB
+
+Ensure MongoDB is running on local machine or configure the connection string in the .env files.
+
+### Build and Run Backend Locally
+
+```bash
+$ cd backend
+$ go mod init music-library-management
+$ go mod tidy
+$ docker run --name musiclibrary-mongo -p 27017:27017 -e MONGO_INITDB_DATABASE=musiclibrary_dev -d mongo:latest
+$ ENV=development go run main.go
+```
+
 ## APIs
 
 ### Music Library Management APIs
@@ -221,4 +247,12 @@
     - **Sample cURL Request:**
       ```bash
       curl --location 'http://localhost:8080/api/genres/'
+      ```
+
+17. **List All Files**
+    - **Endpoint:** `/api/files` (GET)
+    - **Description:** Provides a list of available files.
+    - **Sample cURL Request:**
+      ```bash
+      curl --location 'http://localhost:8080/api/files/?page=1&limit=10'
       ```
